@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#10131a" />
+    <title>Telegram Focus</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark">TF</span>
+          <div>
+            <h1>Telegram Focus</h1>
+            <p>Faqat muhim xabarlar</p>
+          </div>
+        </div>
+        <div class="connection-state">
+          <span id="connection-dot" class="status-dot offline"></span>
+          <span id="connection-label">Ulanmoqda...</span>
+        </div>
+      </header>
+
+      <div class="section-tabs" role="tablist">
+        <button class="section-tab active" data-section="telegram" type="button" role="tab">
+          Telegram <span id="section-telegram-count" class="tab-badge">0</span>
+        </button>
+        <button class="section-tab" data-section="email" type="button" role="tab">
+          Email <span id="section-email-count" class="tab-badge">0</span>
+        </button>
+        <button class="section-tab" data-section="opportunity" type="button" role="tab">
+          Imkoniyatlar <span id="section-opportunity-count" class="tab-badge">0</span>
+        </button>
+        <button class="section-tab" data-section="notifications" type="button" role="tab">
+          Bildirishnomalar <span id="section-notifications-count" class="tab-badge">0</span>
+        </button>
+      </div>
+
+      <div id="global-error" class="notice error hidden" role="alert"></div>
+
+      <section id="telegram-section" class="workspace">
+        <aside class="settings-panel panel">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">Boshqaruv</span>
+              <h2>Manbalar</h2>
+            </div>
+            <span id="source-count" class="count-badge">0</span>
+          </div>
+
+          <form id="source-form" class="source-form">
+            <label>
+              <span>Username yoki Telegram ID</span>
+              <input id="identifier" name="identifier" placeholder="@ustoz yoki 123456789" required />
+            </label>
+            <label>
+              <span>Ko‘rinadigan nom</span>
+              <input id="display-name" name="display_name" placeholder="Masalan: Kurs guruhi" />
+            </label>
+            <label>
+              <span>Manba turi</span>
+              <select id="source-type" name="type">
+                <option value="user">Odam</option>
+                <option value="group">Guruh</option>
+                <option value="channel">Kanal</option>
+              </select>
+            </label>
+            <button class="primary-button" type="submit">
+              <span>+</span> Manba qo‘shish
+            </button>
+          </form>
+
+          <div class="source-list-wrap">
+            <div class="list-label">Kuzatilayotganlar</div>
+            <div id="source-list" class="source-list">
+              <div class="empty-state small">Hali manba qo‘shilmagan.</div>
+            </div>
+          </div>
+        </aside>
+
+        <section class="messages-panel panel">
+          <div class="panel-heading messages-heading">
+            <div>
+              <span class="eyebrow">Jonli oqim</span>
+              <h2>Xabarlar</h2>
+            </div>
+            <div class="heading-actions">
+              <button id="archive-settings-button" class="quiet-button" type="button">⚙ Arxiv sozlamalari</button>
+              <button id="notification-button" class="quiet-button" type="button">
+                Bildirishnomalarni yoqish
+              </button>
+            </div>
+          </div>
+
+          <div class="tabs-row">
+            <div class="tabs">
+              <button class="tab-button active" data-tab="inbox" type="button">
+                Kiruvchi <span id="tab-inbox-count" class="tab-badge">0</span>
+              </button>
+              <button class="tab-button" data-tab="archive" type="button">
+                Arxiv <span id="tab-archive-count" class="tab-badge">0</span>
+              </button>
+            </div>
+            <div id="archive-search-wrap" class="archive-search-wrap hidden">
+              <input id="archive-search" type="search" placeholder="Qidirish (matn yoki jo‘natuvchi)..." />
+            </div>
+          </div>
+
+          <div id="bulk-bar" class="bulk-bar hidden">
+            <span id="bulk-selected-count">0 ta tanlandi</span>
+            <button id="bulk-archive-button" class="primary-button" type="button">Tanlanganlarni arxivga</button>
+          </div>
+
+          <div id="message-list" class="message-list">
+            <div class="empty-state">
+              <div class="empty-icon">✦</div>
+              <strong>Muhim xabarlar shu yerda ko‘rinadi</strong>
+              <span>Manba qo‘shing va Telegram'dan yangi xabar kuting.</span>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section id="email-section" class="workspace hidden">
+        <aside class="settings-panel panel">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">Boshqaruv</span>
+              <h2>Email hisoblar</h2>
+            </div>
+            <span id="email-account-count" class="count-badge">0</span>
+          </div>
+
+          <form id="email-account-form" class="source-form" autocomplete="off">
+            <label>
+              <span>Xizmat (preset)</span>
+              <select id="email-preset">
+                <option value="">Boshqa (qo‘lda)</option>
+              </select>
+            </label>
+            <div id="email-preset-note" class="preset-note hidden"></div>
+            <div id="email-outlook-note" class="preset-note warn">
+              Outlook/Hotmail/M365: hozircha qo‘llab-quvvatlanmaydi (OAuth2 kerak).
+            </div>
+            <label>
+              <span>Nomi</span>
+              <input id="email-label" placeholder="Masalan: Ish pochtasi" required maxlength="255" />
+            </label>
+            <label>
+              <span>IMAP server</span>
+              <input id="email-host" placeholder="imap.gmail.com" required />
+            </label>
+            <label>
+              <span>Port</span>
+              <input id="email-port" type="number" value="993" min="1" max="65535" required />
+            </label>
+            <label>
+              <span>Login (email manzil)</span>
+              <input id="email-username" type="text" autocomplete="off" required />
+            </label>
+            <label>
+              <span>Parol / App Password</span>
+              <input id="email-password" type="password" autocomplete="new-password" required />
+            </label>
+            <label>
+              <span>Papka</span>
+              <input id="email-folder" value="INBOX" />
+            </label>
+            <button id="email-add-button" class="primary-button" type="submit">
+              <span>+</span> Hisob qo‘shish
+            </button>
+          </form>
+
+          <div class="source-list-wrap">
+            <div class="list-label">Ulangan hisoblar</div>
+            <div id="email-account-list" class="source-list">
+              <div class="empty-state small">Hali hisob ulanmagan.</div>
+            </div>
+          </div>
+        </aside>
+
+        <section class="messages-panel panel">
+          <div class="panel-heading messages-heading">
+            <div>
+              <span class="eyebrow">Faqat o‘qish</span>
+              <h2>Xatlar</h2>
+            </div>
+          </div>
+
+          <div class="tabs-row">
+            <div class="tabs">
+              <button class="email-tab-button tab-button active" data-email-tab="inbox" type="button">
+                Kiruvchi <span id="email-tab-inbox-count" class="tab-badge">0</span>
+              </button>
+              <button class="email-tab-button tab-button" data-email-tab="archive" type="button">
+                Arxiv <span id="email-tab-archive-count" class="tab-badge">0</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="email-list" class="message-list">
+            <div class="empty-state">
+              <div class="empty-icon">✉</div>
+              <strong>Xatlar shu yerda ko‘rinadi</strong>
+              <span>Chapdan email hisob ulang.</span>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section id="notifications-section" class="workspace hidden">
+        <div class="panel">
+          <div id="notif-list" class="message-list"></div>
+        </div>
+      </section>
+
+      <section id="opportunity-section" class="opp-section hidden">
+        <div class="opp-topbar panel">
+          <div class="tabs opp-tabs" role="tablist">
+            <button class="opp-tab-button tab-btn-opp active" data-opp-tab="feed" type="button">
+              Lenta <span id="opp-tab-feed-count" class="tab-badge">0</span>
+            </button>
+            <button class="opp-tab-button tab-btn-opp" data-opp-tab="channels" type="button">Kanallar</button>
+            <button class="opp-tab-button tab-btn-opp" data-opp-tab="profile" type="button">Profil</button>
+            <button class="opp-tab-button tab-btn-opp" data-opp-tab="settings" type="button">Sozlamalar</button>
+            <button class="opp-tab-button tab-btn-opp" data-opp-tab="groups" type="button">Guruhlar</button>
+            <button class="opp-tab-button tab-btn-opp" data-opp-tab="test" type="button">Sinov</button>
+          </div>
+        </div>
+
+        <div id="opp-pane-feed" class="opp-pane panel">
+          <div class="tabs opp-subtabs">
+            <button class="opp-feed-tab tab-btn-opp active" data-feed-tab="inbox" type="button">Kiruvchi</button>
+            <button class="opp-feed-tab tab-btn-opp" data-feed-tab="archive" type="button">Arxiv</button>
+          </div>
+          <div id="opp-feed-list" class="message-list opp-list"></div>
+        </div>
+
+        <div id="opp-pane-channels" class="opp-pane panel hidden">
+          <form id="opp-channel-form" class="opp-inline-form">
+            <input id="opp-channel-identifier" placeholder="@kanal, t.me/kanal yoki ID" required maxlength="255" />
+            <button class="primary-button" type="submit"><span>+</span> Kanal qo‘shish</button>
+          </form>
+          <div class="opp-actions-row">
+            <button id="opp-refresh-dialogs" class="quiet-button" type="button">Dialoglarni yangilash</button>
+            <button id="opp-scan-now" class="quiet-button" type="button">Hozir tekshirish</button>
+            <span id="opp-channels-note" class="opp-note"></span>
+          </div>
+          <div id="opp-channel-list" class="source-list"></div>
+        </div>
+
+        <div id="opp-pane-profile" class="opp-pane panel hidden">
+          <form id="opp-profile-form" class="opp-form">
+            <div class="opp-form-grid">
+              <label><span>Yosh</span><input id="opp-p-age" type="number" min="5" max="100" required /></label>
+              <label><span>Sinf (1–11)</span><input id="opp-p-grade" type="number" min="1" max="11" /></label>
+              <label><span>IELTS (0–9)</span><input id="opp-p-ielts" type="number" min="0" max="9" step="0.5" /></label>
+            </div>
+            <label class="settings-checkbox"><input id="opp-p-knows-english" type="checkbox" /><span>Ingliz tilini bilaman</span></label>
+            <label class="settings-checkbox"><input id="opp-p-is-pupil" type="checkbox" /><span>Maktab o‘quvchisiman</span></label>
+            <label class="settings-checkbox"><input id="opp-p-is-student" type="checkbox" /><span>Talabaman</span></label>
+            <label class="settings-checkbox"><input id="opp-p-only-free" type="checkbox" /><span>Faqat bepul imkoniyatlar</span></label>
+            <div>
+              <div class="list-label">Qiziqishlar</div>
+              <div id="opp-p-interests" class="opp-checks"></div>
+            </div>
+            <button class="primary-button" type="submit">Saqlash</button>
+          </form>
+        </div>
+
+        <div id="opp-pane-settings" class="opp-pane panel hidden">
+          <div class="opp-form">
+            <div class="opp-toggle-row">
+              <div>
+                <strong>Imkoniyat monitori</strong>
+                <div class="opp-note">Yoqilganda kuzatilayotgan kanallardan mos postlar lentaga tushadi.</div>
+              </div>
+              <button id="opp-s-enabled" class="toggle" type="button" aria-label="Monitorni yoqish/o‘chirish"></button>
+            </div>
+            <label class="opp-slider">
+              <span>Minimal ball: <b id="opp-s-min-score-label">40</b></span>
+              <input id="opp-s-min-score" type="range" min="0" max="200" step="5" value="40" />
+            </label>
+            <button id="opp-s-save" class="primary-button" type="button">Saqlash</button>
+            <div class="list-label">Holat</div>
+            <div id="opp-status" class="opp-status"></div>
+            <div class="list-label">Yetkazish rejimi</div>
+            <div id="opp-delivery-mode" class="opp-status"></div>
+          </div>
+        </div>
+
+        <div id="opp-pane-groups" class="opp-pane panel hidden">
+          <div id="opp-groups-warning" class="preset-note warn hidden"></div>
+          <form id="opp-group-form" class="opp-inline-form">
+            <input id="opp-group-identifier" placeholder="@guruh, t.me/guruh yoki ID" required maxlength="255" />
+            <input id="opp-group-title" placeholder="Nomi (ixtiyoriy)" maxlength="255" />
+            <button class="primary-button" type="submit"><span>+</span> Guruh qo‘shish</button>
+          </form>
+          <div id="opp-group-list" class="source-list"></div>
+        </div>
+
+        <div id="opp-pane-test" class="opp-pane panel hidden">
+          <div class="opp-form">
+            <label>
+              <span>Post matnini joylang</span>
+              <textarea id="opp-test-text" class="reply-textarea opp-test-textarea" rows="8" maxlength="20000" placeholder="Imkoniyat e’lonining matni..."></textarea>
+            </label>
+            <button id="opp-test-run" class="primary-button" type="button">Tahlil qilish</button>
+            <div id="opp-test-result" class="opp-test-result"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="archive-settings-dialog" class="modal-overlay hidden">
+      <div class="modal-card">
+        <h3>Arxiv sozlamalari</h3>
+        <label class="settings-checkbox">
+          <input type="checkbox" id="setting-archive-on-read" />
+          <span>"O‘qildi" bosilganda avtomatik arxivlash</span>
+        </label>
+        <label class="settings-checkbox">
+          <input type="checkbox" id="setting-archive-on-reply" />
+          <span>Javob yozilganda asl xabarni arxivlash</span>
+        </label>
+        <label class="settings-field">
+          <span>Necha kundan eski o‘qilgan xabarlarni avtomatik arxivlash (0 — o‘chirilgan)</span>
+          <input type="number" id="setting-auto-archive-days" min="0" step="1" />
+        </label>
+        <hr />
+        <label class="settings-checkbox">
+          <input type="checkbox" id="setting-auto-reply-enabled" />
+          <span>Daraja 2 xabarlarga avtomatik "AI assistent" javobini yuborish</span>
+        </label>
+        <div class="modal-actions">
+          <button id="archive-settings-cancel" class="quiet-button" type="button">Bekor qilish</button>
+          <button id="archive-settings-save" class="primary-button" type="button">Saqlash</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  
+  <!-- AI CHIEF OF STAFF - SIDEBAR -->
+  <aside id="ai-sidebar" class="ai-sidebar-panel">
+    <div class="ai-side-header">
+      <div class="ai-side-title">
+        <span class="ai-status-pulse"></span>
+        <strong>AI Maslahatchi</strong>
+      </div>
+      <span id="ai-model-label" class="ai-badge">Gemini Online</span>
+    </div>
+
+    <div class="ai-side-focus">
+      <small>Ustuvor yo'nalish:</small>
+      <div id="ai-sidebar-rule">Xabarlar tahlil qilinmoqda...</div>
+    </div>
+
+    <div id="ai-sidebar-chat" class="ai-side-messages"></div>
+
+    <div class="ai-side-chips">
+      <button type="button" class="ai-chip" data-q="Wharton guruhidagi xabarlarni tahlil qilib ber">📈 Wharton guruhi</button>
+      <button type="button" class="ai-chip" data-q="Xabarlarda qanday grant yoki imkoniyatlar bor?">🎓 Grantlar</button>
+      <button type="button" class="ai-chip" data-q="Bugun birinchi nimadan boshlaymiz?">🎯 Bosh vazifa</button>
+    </div>
+
+    <div class="ai-side-input-row">
+      <input type="text" id="ai-side-input" placeholder="Xabarlar bo'yicha savol bering...">
+      <button type="button" id="ai-side-send-btn">➔</button>
+    </div>
+  </aside>
+
+</body>
+</html>

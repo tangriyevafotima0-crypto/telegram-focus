@@ -1,0 +1,11 @@
+Telethon==1.44.0
+fastapi==0.141.1
+uvicorn[standard]==0.52.1
+SQLAlchemy==2.0.52
+aiosqlite==0.22.1
+python-dotenv==1.2.3
+pydantic==2.13.4
+websockets==16.0
+httpx==0.28.1
+beautifulsoup4==4.14.3
+pypdf==5.9.0

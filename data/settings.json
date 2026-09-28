@@ -1,0 +1,5 @@
+{
+  "archive_on_read": true,
+  "archive_on_reply": true,
+  "auto_archive_days": 2
+}

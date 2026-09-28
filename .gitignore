@@ -1,0 +1,10 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.env
+config.json
+*.session
+*.session-journal
+*.log
+venv/
+*.zip
